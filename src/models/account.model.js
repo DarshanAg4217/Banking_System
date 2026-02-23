@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ledgerModel = require('./ledger.model');
 
 const accountSchema = new mongoose.Schema({
     user: {
@@ -8,10 +9,13 @@ const accountSchema = new mongoose.Schema({
         index: true
     },
     status: {
+        type: String,
         enum: {
             values: ['ACTIVE', 'FROZEN', 'CLOSED'],
-            message: 'Status must be either ACTIVE, FROZEN, or CLOSED'
-        }
+            message: 'Status must be either ACTIVE, FROZEN, or CLOSED',
+
+        },
+        default: 'ACTIVE'
     },
     currency: {
         type: String,
@@ -25,6 +29,52 @@ const accountSchema = new mongoose.Schema({
 );
 
 accountSchema.index({ user: 1, status: 1 });
+
+accountSchema.method.getBalance = async function () {
+
+    // Aggregate ledger entries to calculate the current balance for this account
+    // We sum up all debit and credit entries and calculate the balance as totalCredit - totalDebit
+    const balanceData = await ledgerModel.aggregate([
+        { $match: { account: this._id } },
+        {
+            $group: {
+                _id: null,
+                totalDebit: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ['$type', 'debit'] },
+                            '$amount',
+                            0
+                        ]
+                    }
+                },
+                totalCredit: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ['$type', 'credit'] },
+                            '$amount',
+                            0
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                balance: { $subtract: ['$totalCredit', '$totalDebit'] }
+            }
+        }
+    ]);
+
+
+    if (balanceData.length === 0) {
+        return 0; // No transactions, balance is zero
+    }
+    return balanceData[0].balance;
+
+
+}
 
 const accountModel = mongoose.model('account', accountSchema);
 

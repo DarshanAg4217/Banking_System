@@ -203,9 +203,108 @@ Backend Ledger Team
     await sendEmail(userEmail, subject, text, html);
 }
 
+
+async function sendTransactionEmail(userEmail, name, transactionDetails) {
+
+    const subject = "Transaction Confirmation - Backend Ledger 📄";
+
+    const text = `
+Hello ${name},
+
+We are pleased to inform you that your transaction has been successfully processed.
+
+Transaction Details:
+- Amount: ₹${transactionDetails.amount}
+- From Account: ${transactionDetails.fromAccount}
+- To Account: ${transactionDetails.toAccount}
+- Status: ${transactionDetails.status}
+
+If you have any questions, please contact our support team.
+
+Best Regards,
+Backend Ledger Team
+`;
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+        <div style="max-width:600px; margin:auto; background:#fff; border-radius:8px; padding:30px;">
+            <h2 style="color:#198754;">Transaction Successful ✅</h2>
+            <p>Hello <strong>${name}</strong>,</p>
+            <p>Your transaction has been processed successfully.</p>
+
+            <table width="100%" cellpadding="10" style="border-collapse:collapse;">
+                <tr><td><strong>Amount:</strong></td><td>₹${transactionDetails.amount}</td></tr>
+                <tr><td><strong>From Account:</strong></td><td>${transactionDetails.fromAccount}</td></tr>
+                <tr><td><strong>To Account:</strong></td><td>${transactionDetails.toAccount}</td></tr>
+                <tr><td><strong>Status:</strong></td><td style="color:green;"><strong>${transactionDetails.status}</strong></td></tr>
+            </table>
+
+            <p style="margin-top:20px;">Thank you for using Backend Ledger.</p>
+        </div>
+    </body>
+    </html>
+    `;
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
+
+
+async function sendTransactionFailureEmail(userEmail, name, transactionDetails) {
+
+    const subject = "Transaction Failed - Backend Ledger ⚠️";
+
+    const text = `
+Hello ${name},
+
+We regret to inform you that your transaction could not be completed.
+
+Transaction Details:
+- Amount: ₹${transactionDetails.amount}
+- From Account: ${transactionDetails.fromAccount}
+- To Account: ${transactionDetails.toAccount}
+- Status: ${transactionDetails.status}
+
+Please verify your account balance or try again later.
+
+If the issue persists, contact support.
+
+Best Regards,
+Backend Ledger Team
+`;
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+        <div style="max-width:600px; margin:auto; background:#fff; border-radius:8px; padding:30px;">
+            <h2 style="color:#dc3545;">Transaction Failed ❌</h2>
+            <p>Hello <strong>${name}</strong>,</p>
+            <p>Unfortunately, your transaction could not be completed.</p>
+
+            <table width="100%" cellpadding="10" style="border-collapse:collapse;">
+                <tr><td><strong>Amount:</strong></td><td>₹${transactionDetails.amount}</td></tr>
+                <tr><td><strong>From Account:</strong></td><td>${transactionDetails.fromAccount}</td></tr>
+                <tr><td><strong>To Account:</strong></td><td>${transactionDetails.toAccount}</td></tr>
+                <tr><td><strong>Status:</strong></td><td style="color:red;"><strong>${transactionDetails.status}</strong></td></tr>
+            </table>
+
+            <p style="margin-top:20px;">Please try again or contact support.</p>
+        </div>
+    </body>
+    </html>
+    `;
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
 module.exports = {
     sendLoginEmail,
-    sendRegistrationEmail
+    sendRegistrationEmail,
+    sendTransactionEmail,
+    sendTransactionFailureEmail
 };
 
 

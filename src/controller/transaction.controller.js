@@ -103,11 +103,8 @@ async function createTransaction(req, res) {
             message: `Insufficient balance. Current balance is ${balance}. Requested amount is ${amount}`
         })
     }
-
     let transaction;
     try {
-
-
         /**
          * 5. Create transaction (PENDING)
          */
@@ -129,9 +126,9 @@ async function createTransaction(req, res) {
             type: "debit"
         }], { session })
 
-        // await (() => {
-        //     return new Promise((resolve) => setTimeout(resolve, 15 * 1000));
-        // })()
+        await (() => {
+            return new Promise((resolve) => setTimeout(resolve, 15 * 1000));
+        })()
 
         const creditLedgerEntry = await ledgerModel.create([{
             account: toAccount,
@@ -191,7 +188,6 @@ async function createInitialFundsTransaction(req, res) {
     }
 
     const fromUserAccount = await accountModel.findOne({
-        systemUser: true,
         user: req.user._id
     })
 
@@ -213,7 +209,6 @@ async function createInitialFundsTransaction(req, res) {
         status: "PENDING"
     })
 
-    console.log("Creating debit ledger with type:", "debit");
 
     const debitLedgerEntry = await ledgerModel.create([{
         account: fromUserAccount._id,
@@ -222,7 +217,6 @@ async function createInitialFundsTransaction(req, res) {
         type: "debit"
     }], { session })
 
-    console.log("Creating credit ledger with type:", "credit");
 
     const creditLedgerEntry = await ledgerModel.create([{
         account: toAccount,

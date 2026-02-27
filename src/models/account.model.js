@@ -30,7 +30,7 @@ const accountSchema = new mongoose.Schema({
 
 accountSchema.index({ user: 1, status: 1 });
 
-accountSchema.method.getBalance = async function () {
+accountSchema.methods.getBalance = async function () {
 
     // Aggregate ledger entries to calculate the current balance for this account
     // We sum up all debit and credit entries and calculate the balance as totalCredit - totalDebit
